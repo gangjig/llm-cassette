@@ -95,31 +95,19 @@ to the cassette file.
 
 ## Recreate this project from a prompt
 
-> Build a Python package called `llm-cassette`: VCR-style record and
-> replay for LLM chat-completion calls, standard library only. A
-> request is a dict with model, messages and temperature; its
-> fingerprint is a SHA-256 over a canonical JSON form (model, message
-> roles and stripped contents, temperature — incidental fields like
-> user/metadata excluded). A cassette is a JSONL file of interactions
-> (fingerprint, canonical request, response with text and optional
-> token counts), verified against recomputed fingerprints on load,
-> with no timestamps so files diff cleanly. Playback consumes
-> interactions in recorded order per fingerprint and raises a
-> CassetteMiss when exhausted. Provide a client wrapper around any
-> live-call callable with three modes — replay (never live, miss
-> raises), record (always live, append), auto (replay on hit, record
-> on miss) — and hit/miss/live-call counters. Provide an
-> OpenAI-compatible HTTP server (stdlib http.server) that answers
-> chat-completion POSTs from a cassette with a proper response body,
-> returns a named `cassette_miss` 404 on a miss, exposes /healthz,
-> and with an --upstream option acts as a recording proxy that
-> forwards requests, relays responses verbatim and appends parseable
-> responses to the cassette file. Add a CLI with serve, stats and a
-> demo subcommand (record a tiny scripted session against a fake live
-> call, then replay it with zero live calls and identical answers),
-> and a pytest suite covering fingerprint canonicalization, ordered
-> playback, client modes, the HTTP server in both modes against real
-> local sockets, and the CLI.
+> Write a small Python package, standard library only, that brings VCR-
+> style record and replay to LLM chat-completion calls so agent tests
+> can run deterministically without a live API. Requests are matched by
+> a stable fingerprint of the model, messages, and temperature, and
+> interactions are stored in a JSONL cassette file that stays diff-
+> friendly and is integrity-checked when loaded; playback replays
+> recorded responses in order and complains loudly when a request has no
+> recording left. A client wrapper can replay only, record only, or fall
+> back to recording on a miss, and an OpenAI-compatible local server can
+> answer calls from a cassette or, with an upstream configured, act as a
+> recording proxy. Include a demo that records a scripted session
+> against a fake live call and then replays it with zero live calls and
+> identical answers.
 
 ## Limitations
 
